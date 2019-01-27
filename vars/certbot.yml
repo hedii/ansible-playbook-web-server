@@ -1,0 +1,4 @@
+---
+certbot_admin_email: "{{ secret_certbot_admin_email }}"
+certbot_create_if_missing: yes
+certbot_certs: []

@@ -1,0 +1,79 @@
+---
+- name: Before pre install tasks
+  hosts: all
+  become: yes
+  gather_facts: no
+  vars_files:
+    - vars/locales.yml
+  tasks:
+    - name: Ensure locale is set correctly
+      locale_gen:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ locales_to_install }}"
+
+    - name: Enable stretch backports
+      apt_repository:
+        repo: deb http://debian.mirrors.ovh.net/debian stretch-backports main contrib non-free
+        filename: stretch-backports
+        state: present
+        update_cache: yes
+
+    - name: Ensure base packages are present
+      apt:
+        name:
+          - dirmngr
+          - software-properties-common
+          - apt-transport-https
+          - lsb-release
+          - ca-certificates
+          - htop
+          - fail2ban
+          - git
+          - curl
+          - vim
+          - python-setuptools
+          - python-passlib
+          - zip
+          - unzip
+          - python-pip
+        state: present
+
+    - name: Add php apt repo key
+      apt_key:
+        url: https://packages.sury.org/php/apt.gpg
+        state: present
+
+    - name: Add php apt repository
+      apt_repository:
+        repo: deb https://packages.sury.org/php/ stretch main
+        state: present
+
+    - name: Add nginx apt repo keys
+      apt_key:
+        url: https://nginx.org/keys/nginx_signing.key
+        state: present
+
+    - name: Add nginx apt repository
+      apt_repository:
+        repo: "{{ item }}"
+        state: present
+      with_items:
+        - deb http://nginx.org/packages/mainline/debian/ stretch nginx
+        - deb-src http://nginx.org/packages/mainline/debian/ stretch nginx
+
+    - name: Add mariadb repo key
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: "0xF1656F24C74CD1D8" # do not remove double quotes
+        state: present
+
+    - name: Add mariadb repo
+      apt_repository:
+        repo: deb [arch=amd64] http://mariadb.mirrors.ovh.net/MariaDB/repo/10.3/debian stretch main
+        state: present
+
+    - name: Ensure nginx is installed
+      apt:
+        name: nginx
+        state: present

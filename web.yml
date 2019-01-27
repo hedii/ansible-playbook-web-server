@@ -1,0 +1,20 @@
+---
+- name: Ensure web tasks are performed
+  hosts: web-servers
+  become: yes
+  vars_files:
+    - vars/certbot.yml
+    - vars/locales.yml
+    - vars/mysql.yml
+    - vars/nginx.yml
+    - vars/php.yml
+    - vars/redis.yml
+    - vars/secret.yml
+  roles:
+    - DavidWittman.redis
+    - geerlingguy.mysql
+    - geerlingguy.php-versions
+    - geerlingguy.php
+    - geerlingguy.composer
+    - geerlingguy.nginx
+    - geerlingguy.certbot
